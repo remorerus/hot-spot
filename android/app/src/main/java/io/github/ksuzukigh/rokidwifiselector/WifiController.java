@@ -1,6 +1,7 @@
 package io.github.ksuzukigh.rokidwifiselector;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,6 +26,7 @@ final class WifiController {
         this.wifi = (WifiManager) this.context.getSystemService(Context.WIFI_SERVICE);
     }
 
+    @SuppressLint("MissingPermission")
     JSONObject status() throws Exception {
         JSONObject out = new JSONObject();
         boolean enabled = wifi != null && wifi.isWifiEnabled();
@@ -38,6 +40,7 @@ final class WifiController {
         return out;
     }
 
+    @SuppressLint("MissingPermission")
     JSONObject networks() throws Exception {
         requireLocationPermission();
         if (wifi == null) throw new IllegalStateException("Служба Wi-Fi недоступна");
@@ -73,6 +76,7 @@ final class WifiController {
                 .put("currentSsid", current).put("networks", array);
     }
 
+    @SuppressLint("MissingPermission")
     JSONObject connect(String requestedSsid) throws Exception {
         requireLocationPermission();
         String wanted = normalize(requestedSsid);
@@ -125,6 +129,7 @@ final class WifiController {
         return out;
     }
 
+    @SuppressLint("MissingPermission")
     JSONObject turnWifiOn() throws Exception {
         if (wifi == null) return error("wifi_unavailable", "Служба Wi-Fi недоступна");
         try {
