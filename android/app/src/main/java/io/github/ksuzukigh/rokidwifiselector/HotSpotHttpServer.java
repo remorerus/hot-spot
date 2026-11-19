@@ -69,7 +69,8 @@ final class HotSpotHttpServer implements Runnable {
             }
             JSONObject result;
             try {
-                if ("GET".equals(method) && "/v1/aliases".equals(path)) result = new JSONObject().put("ok", true).put("aliases", new org.json.JSONArray().put(new JSONObject().put("alias", "студио").put("ssid", "Studio")).put(new JSONObject().put("alias", "studio").put("ssid", "Studio")).put(new JSONObject().put("alias", "локал нетворк").put("ssid", "Local_Network_5G")).put(new JSONObject().put("alias", "local network").put("ssid", "Local_Network_5G")));\n                else if ("GET".equals(method) && "/v1/status".equals(path)) result = controller.status();
+                if ("GET".equals(method) && "/v1/aliases".equals(path)) result = new JSONObject().put("ok", true).put("aliases", new org.json.JSONArray().put(new JSONObject().put("alias", "студио").put("ssid", "Studio")).put(new JSONObject().put("alias", "studio").put("ssid", "Studio")).put(new JSONObject().put("alias", "локал нетворк").put("ssid", "Local_Network_5G")).put(new JSONObject().put("alias", "local network").put("ssid", "Local_Network_5G")));
+                else if ("GET".equals(method) && "/v1/status".equals(path)) result = controller.status();
                 else if ("GET".equals(method) && "/v1/networks".equals(path)) result = controller.networks();
                 else if ("POST".equals(method) && "/v1/connect".equals(path)) {
                     JSONObject input = body.length == 0 ? new JSONObject() : new JSONObject(new String(body, StandardCharsets.UTF_8));
