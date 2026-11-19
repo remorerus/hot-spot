@@ -7,8 +7,8 @@ android {
         applicationId 'io.github.ksuzukigh.rokidwifiselector'
         minSdk 26
         targetSdk 28
-        versionCode 3
-        versionName '1.1.1-r3'
+        versionCode 4
+        versionName '1.1.1-r4'
         testInstrumentationRunner 'android.app.InstrumentationTestRunner'
     }
     buildTypes { debug { minifyEnabled false }; release { minifyEnabled false } }
