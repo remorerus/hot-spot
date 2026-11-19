@@ -1,11 +1,29 @@
-# Hot Spot for Rokid Glasses
+# Хот Спот для Rokid RV101
 
-Android companion app and AIUI voice agent for switching between saved Wi-Fi networks on Rokid Glasses.
+Русская адаптация [Rokid Wi-Fi Selector](https://github.com/ksuzukigh/rokid-wifi-selector), лицензия MIT.
 
-The GitHub Actions workflow builds a debug APK from the `android/` project and publishes it as the `Hot-Spot-APK` artifact. Source files are being added to this repository; a successful workflow run is required before an APK can be downloaded.
+## Реализовано в этой версии
+- Русский интерфейс вместо японского.
+- Показ текущей сети и доступных сохранённых сетей.
+- Ручной выбор свайпом и подключение касанием.
+- Фоновая команда подключения через Android broadcast:
+  - действие: `io.github.ksuzukigh.rokidwifiselector.CONNECT`
+  - строковый параметр `ssid`: точное имя сохранённой сети.
+- Результат: действие `io.github.ksuzukigh.rokidwifiselector.RESULT`, параметры `success`, `ssid`, `message`.
+- Успех сообщается только после проверки фактического SSID. Тайм-аут — 15 секунд, затем попытка вернуть прежнюю сеть.
 
-Configured voice targets:
-- `Studio`
-- `Local_Network_5G` (spoken as “Local Network”)
+## Голосовые команды
+- «Хот Спот, подключись к Studio» → `Studio`
+- «Хот Спот, подключись к Local Network» → `Local_Network_5G`
 
-The app only switches to networks already saved in the system and confirms the resulting SSID before reporting success.
+Сети должны быть заранее добавлены в очки через Hi Rokid. Пароли приложение не запрашивает и не хранит.
+
+## Первый запуск
+1. Установить APK через Hi Rokid.
+2. Один раз открыть «Хот Спот».
+3. Разрешить доступ к геоданным: Android требует это разрешение для чтения SSID и списка Wi-Fi сетей.
+
+## Ограничение, которое нужно проверить на очках
+Используется тот же системный механизм `WifiManager.enableNetwork()`, что и в оригинальном проекте. YodaOS на конкретной прошивке может ограничивать вызов для обычного приложения. Фоновая команда также должна быть проверена на реальном RV101. Успешная сборка сама по себе не подтверждает работу на очках.
+
+Исходный проект и авторство: https://github.com/ksuzukigh/rokid-wifi-selector
