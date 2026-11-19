@@ -5,11 +5,15 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.SystemClock;
+import android.os.Build;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.*;
@@ -30,12 +34,13 @@ final class WifiController {
     JSONObject status() throws Exception {
         JSONObject out = new JSONObject();
         boolean enabled = wifi != null && wifi.isWifiEnabled();
-        WifiInfo info = wifi == null ? null : wifi.getConnectionInfo();
-        String ssid = info == null ? "" : normalize(info.getSSID());
+        boolean connected = isWifiTransportActive();
+        String ssid = currentSsid();
         out.put("ok", true);
         out.put("wifiEnabled", enabled);
-        out.put("connected", info != null && info.getNetworkId() >= 0 && !ssid.isEmpty());
+        out.put("connected", connected);
         out.put("ssid", ssid);
+        out.put("ssidAvailable", !ssid.isEmpty());
         out.put("wifiState", wifi == null ? -1 : wifi.getWifiState());
         return out;
     }
@@ -156,16 +161,55 @@ final class WifiController {
         if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             throw new SecurityException("Разрешите приложению Хот Спот доступ к местоположению: это нужно Android для чтения имён Wi-Fi сетей.");
     }
+    private boolean isWifiTransportActive() {
+        try {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm == null) return false;
+            Network active = cm.getActiveNetwork();
+            NetworkCapabilities caps = active == null ? null : cm.getNetworkCapabilities(active);
+            if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return true;
+            for (Network network : cm.getAllNetworks()) {
+                NetworkCapabilities candidate = cm.getNetworkCapabilities(network);
+                if (candidate != null && candidate.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return true;
+            }
+            return false;
+        } catch (RuntimeException e) {
+            try {
+                WifiInfo info = wifi == null ? null : wifi.getConnectionInfo();
+                return info != null && info.getNetworkId() >= 0;
+            } catch (RuntimeException ignored) { return false; }
+        }
+    }
+
     private String currentSsid() {
-        try { WifiInfo info = wifi.getConnectionInfo(); return info == null ? "" : normalize(info.getSSID()); }
-        catch (RuntimeException e) { return ""; }
+        try {
+            WifiInfo info = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                Network active = cm == null ? null : cm.getActiveNetwork();
+                NetworkCapabilities caps = active == null || cm == null ? null : cm.getNetworkCapabilities(active);
+                if (caps == null || !caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    if (cm != null) for (Network network : cm.getAllNetworks()) {
+                        NetworkCapabilities candidate = cm.getNetworkCapabilities(network);
+                        if (candidate != null && candidate.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) { caps = candidate; break; }
+                    }
+                }
+                if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        && caps.getTransportInfo() instanceof WifiInfo) info = (WifiInfo) caps.getTransportInfo();
+            }
+            if (info == null && wifi != null) info = wifi.getConnectionInfo();
+            if (info == null) return "";
+            String ssid = normalize(info.getSSID());
+            if (ssid.equalsIgnoreCase("unknown ssid")) return "";
+            return ssid;
+        } catch (RuntimeException e) { return ""; }
     }
     static String normalize(String raw) {
         if (raw == null) return "";
         String value = raw.trim();
         if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\""))
             value = value.substring(1, value.length() - 1);
-        if ("<unknown ssid>".equalsIgnoreCase(value)) return "";
+        if ("<unknown ssid>".equalsIgnoreCase(value) || "unknown ssid".equalsIgnoreCase(value) || "0x".equalsIgnoreCase(value)) return "";
         return value;
     }
     private JSONObject error(String code, String message) throws Exception {
