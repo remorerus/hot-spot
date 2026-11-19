@@ -70,6 +70,8 @@ final class WifiController {
             String name = normalize(item.SSID);
             if (!name.isEmpty() && nearby.contains(name)) saved.putIfAbsent(name, item.networkId);
         }
+        // Always expose the active SSID, even if the scan result omits it.
+        if (!current.isEmpty()) saved.putIfAbsent(current, -1);
         List<String> names = new ArrayList<>(saved.keySet());
         names.sort(String.CASE_INSENSITIVE_ORDER);
         JSONArray array = new JSONArray();
@@ -83,10 +85,17 @@ final class WifiController {
 
     @SuppressLint("MissingPermission")
     JSONObject connect(String requestedSsid) throws Exception {
-        requireLocationPermission();
         String wanted = normalize(requestedSsid);
         if (wanted.isEmpty()) return error("ssid_required", "Не указано имя Wi-Fi сети");
         if (wifi == null || !wifi.isWifiEnabled()) return error("wifi_off", "Wi-Fi выключен");
+        // Do not require a scan or location permission to confirm an already active network.
+        String activeSsid = currentSsid();
+        if (wanted.equals(activeSsid)) {
+            JSONObject out = status();
+            out.put("message", "Очки уже подключены к этой сети");
+            return out;
+        }
+        requireLocationPermission();
         try { wifi.startScan(); } catch (RuntimeException ignored) {}
         SystemClock.sleep(500);
         List<WifiConfiguration> configured = wifi.getConfiguredNetworks();
