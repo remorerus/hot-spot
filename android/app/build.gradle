@@ -3,7 +3,8 @@ android {
     namespace 'io.github.ksuzukigh.rokidwifiselector'
     compileSdk 35
     defaultConfig {
-        applicationId 'io.github.ksuzukigh.rokidwifiselector'
+        // Keep the original companion package so this replaces the existing Hot Spot APK.
+        applicationId 'com.remore.hotspot'
         minSdk 26
         targetSdk 28
         versionCode 2
