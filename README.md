@@ -1,11 +1,33 @@
-# Hot Spot for Rokid Glasses
+# Хот Спот для Rokid RV101
 
-Android companion app and AIUI voice agent for switching between saved Wi-Fi networks on Rokid Glasses.
+Русская версия приложения на основе [Rokid Wi-Fi Selector](https://github.com/ksuzukigh/rokid-wifi-selector), объединённая с существующим голосовым мостом проекта «Хот Спот». Исходный Selector распространяется по MIT License.
 
-The GitHub Actions workflow builds a debug APK from the `android/` project and publishes it as the `Hot-Spot-APK` artifact. Source files are being added to this repository; a successful workflow run is required before an APK can be downloaded.
+## Возможности
+- Русский интерфейс вместо японского.
+- Показ текущей сети и доступных сохранённых сетей.
+- Ручной выбор свайпом и подключение касанием.
+- Фоновый локальный мост для AIUI-агента на `127.0.0.1:38762`.
+- Подтверждение подключения по фактическому SSID.
+- При неудаче через 15 секунд — попытка вернуть прежнюю сеть.
+- Пароли Wi-Fi не запрашиваются и не хранятся.
 
-Configured voice targets:
-- `Studio`
-- `Local_Network_5G` (spoken as “Local Network”)
+## Голосовые команды
+- «Хот Спот, какая сейчас сеть?»
+- «Хот Спот, покажи доступные сети»
+- «Хот Спот, подключись к Studio» → сохранённый SSID `Studio`
+- «Хот Спот, подключись к Local Network» → сохранённый SSID `Local_Network_5G`
+- «Хот Спот, включи Wi-Fi»
 
-The app only switches to networks already saved in the system and confirms the resulting SSID before reporting success.
+Сети должны быть заранее сохранены на очках через Hi Rokid. Голосовой агент использует существующий локальный API и токен из исходного проекта «Хот Спот».
+
+## Первый запуск
+1. Установить APK через Hi Rokid.
+2. Один раз открыть «Хот Спот».
+3. Разрешить доступ к геоданным: Android требует его для чтения SSID и списка Wi-Fi.
+4. Приложение запускает локальный фоновый сервис. После перезагрузки его запуск запрашивает системный BootReceiver.
+
+## Сборка
+GitHub Actions запускает `gradle test lint assembleDebug` в каталоге `android/` и публикует артефакт `Hot-Spot-RU-APK`.
+
+## Важное ограничение
+В основе переключения используется `WifiManager.enableNetwork()`, как в исходном Selector. Конкретная прошивка YodaOS может ограничивать эту операцию для обычных приложений. Сборка не доказывает работу на устройстве: окончательную проверку нужно выполнить на Rokid RV101.

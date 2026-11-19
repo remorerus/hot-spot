@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Хот Спот — Wi-Fi</string>
+    <string name="checking">Проверяю…</string>
+    <string name="connected_label">Подключено к сети</string>
+    <string name="permission_needed">Нужно разрешение</string>
+    <string name="permission_reason">Чтобы показать название Wi-Fi</string>
+    <string name="permission_action">Разрешите доступ к геоданным</string>
+    <string name="permission_retry">Закройте приложение и откройте снова</string>
+    <string name="permission_title">Доступ к Wi-Fi</string>
+    <string name="permission_prompt">В системном окне Android</string>
+    <string name="permission_privacy">Местоположение не записывается и не отправляется</string>
+    <string name="enabling_wifi">Включаю Wi-Fi…</string>
+    <string name="please_wait">Подождите немного</string>
+    <string name="checking_connection">Проверяю подключение…</string>
+    <string name="nearby_saved_wifi">Сохранённые сети поблизости</string>
+    <string name="no_alternative">Других сетей не найдено</string>
+    <string name="register_in_hi_rokid">Добавить сеть можно в приложении Hi Rokid</string>
+    <string name="switch_target">Сеть для подключения</string>
+    <string name="position_format">%1$d из %2$d</string>
+    <string name="choose_and_connect">Смахните влево или вправо — выбрать; нажмите один раз — подключиться</string>
+    <string name="connect_once">Нажмите один раз, чтобы подключиться</string>
+    <string name="connecting">Подключаюсь…</string>
+    <string name="switch_start_failed">Не удалось начать переключение</string>
+    <string name="connected_success">Подключение выполнено</string>
+    <string name="returning_to_apps">Возвращаюсь к списку приложений</string>
+    <string name="original_network">Исходная сеть</string>
+    <string name="connection_failed">Не удалось подключиться</string>
+    <string name="restoring_original">Возвращаю прежнюю сеть</string>
+    <string name="retry_later">Попробуйте ещё раз немного позже</string>
+    <string name="wifi_unavailable">Не удалось получить доступ к Wi-Fi</string>
+    <string name="double_tap_to_return">Дважды коснитесь, чтобы вернуться</string>
+</resources>
