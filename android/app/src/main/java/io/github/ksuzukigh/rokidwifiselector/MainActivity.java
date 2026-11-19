@@ -13,6 +13,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -82,6 +83,7 @@ public final class MainActivity extends Activity {
                     LOCATION_REQUEST);
             return;
         }
+        startBridge();
         startReading();
     }
 
@@ -104,6 +106,7 @@ public final class MainActivity extends Activity {
         if (requestCode == LOCATION_REQUEST
                 && grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startBridge();
             startReading();
         } else {
             currentName.setText(R.string.permission_needed);
@@ -112,6 +115,12 @@ public final class MainActivity extends Activity {
             position.setText("");
             guidance.setText(R.string.permission_retry);
         }
+    }
+
+    private void startBridge() {
+        Intent service = new Intent(this, HotSpotService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(service);
+        else startService(service);
     }
 
     private void startReading() {
